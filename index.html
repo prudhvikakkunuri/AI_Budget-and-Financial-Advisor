@@ -1,1 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoneyMate AI — Smart Personal Finance Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0f1a;
+    --bg-panel: #111827;
+    --line: #1e293b;
+    --text: #e5e9f0;
+    --text-dim: #8b97ad;
+    --accent: #38bdf8;
+    --accent-2: #34d399;
+    --accent-glow: rgba(56,189,248,0.35);
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .mono{ font-family: 'JetBrains Mono', monospace; }
+  .wrap{ max-width: 1040px; margin: 0 auto; padding: 0 26px; }
+  a{ color: inherit; }
 
+  /* ---------- TITLE BAR ---------- */
+  .titlebar{
+    background: #050810;
+    border-bottom: 1px solid var(--line);
+    padding: 9px 0;
+  }
+  .titlebar .wrap{ display:flex; align-items:center; gap: 8px; }
+  .titlebar .dots{ display:flex; gap: 6px; }
+  .titlebar .dots span{ width:10px; height:10px; border-radius:50%; }
+  .titlebar .dots span:nth-child(1){ background:#ff5f56; }
+  .titlebar .dots span:nth-child(2){ background:#ffbd2e; }
+  .titlebar .dots span:nth-child(3){ background:#27c93f; }
+  .titlebar .filename{ font-family:'JetBrains Mono'; font-size:12px; color: var(--text-dim); margin-left: 14px; }
+
+  /* ---------- NAV ---------- */
+  header{
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,15,26,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav{ display:flex; justify-content: space-between; align-items:center; padding: 14px 0; }
+  .brand{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:14px; font-family:'JetBrains Mono'; }
+  .brand .bracket{ color: var(--accent); }
+  .nav-links{ display:flex; gap: 4px; }
+  .nav-links a{
+    color: var(--text-dim); text-decoration:none; font-size:13px; font-family:'JetBrains Mono';
+    padding: 6px 12px; border-radius: 6px; transition: background .15s, color .15s;
+  }
+  .nav-links a:hover{ background: var(--bg-panel); color: var(--accent); }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 80px 0 64px; }
+  .terminal{
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    max-width: 720px;
+    margin-bottom: 38px;
+    overflow:hidden;
+  }
+  .terminal-head{
+    display:flex; align-items:center; gap:8px;
+    padding: 10px 14px; border-bottom: 1px solid var(--line);
+    font-family:'JetBrains Mono'; font-size: 11px; color: var(--text-dim);
+  }
+  .terminal-head .led{ width:7px; height:7px; border-radius:50%; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+  .terminal-body{ padding: 16px 18px; font-family:'JetBrains Mono'; font-size: 13px; }
+  .terminal-body .prompt{ color: var(--accent); }
+  .terminal-body .out{ color: var(--text-dim); margin-top: 6px; }
+
+  h1{
+    font-size: clamp(34px, 5vw, 54px); font-weight: 800;
+    line-height: 1.1; letter-spacing: -1px; max-width: 760px;
+  }
+  h1 .accent-text{ color: var(--accent); }
+  .lede{ margin-top: 22px; font-size: 17px; color: var(--text-dim); max-width: 580px; }
+  .cta-row{ display:flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  .btn{
+    font-family:'JetBrains Mono'; font-size: 14px; font-weight:600; padding: 13px 22px;
+    border-radius: 8px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .btn-primary{
+    background: var(--accent); color: #04141f; font-weight: 700;
+    box-shadow: 0 0 22px -4px var(--accent-glow);
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 0 32px -2px var(--accent-glow); }
+  .btn-secondary{ border: 1px solid var(--line); background: var(--bg-panel); color: var(--text); }
+  .btn-secondary:hover{ border-color: var(--accent); transform: translateY(-2px); }
+
+  .stack-row{ margin-top: 38px; display:flex; gap:10px; flex-wrap: wrap; }
+  .tag{
+    font-family:'JetBrains Mono'; font-size: 12px; color: var(--accent-2);
+    border: 1px solid var(--line); background: var(--bg-panel); padding: 6px 12px; border-radius: 6px;
+  }
+
+  /* ---------- SECTION ---------- */
+  section{ padding: 70px 0; border-top: 1px solid var(--line); }
+  .section-label{
+    font-family:'JetBrains Mono'; font-size: 12px; color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .section-label::before{ content:"# "; color: var(--text-dim); }
+  h2{ font-size: clamp(24px, 3.2vw, 32px); font-weight: 700; max-width: 600px; }
+  .section-sub{ margin-top: 12px; color: var(--text-dim); font-size: 15px; max-width: 560px; }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items:start; }
+  .about-grid p{ color: var(--text-dim); font-size: 15px; }
+  .about-grid p + p{ margin-top: 14px; }
+  .code-block{
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px;
+    font-family:'JetBrains Mono'; font-size: 12.5px; color: var(--text-dim); line-height: 1.8;
+  }
+  .code-block .k{ color: var(--accent-2); }
+  .code-block .v{ color: var(--accent); }
+
+  /* ---------- PIPELINE ---------- */
+  .pipeline{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .agent-card{
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 18px; transition: border-color .2s ease, transform .2s ease;
+  }
+  .agent-card:hover{ border-color: var(--accent); transform: translateY(-3px); }
+  .agent-card .top-row{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 14px; }
+  .agent-card .num{ font-family:'JetBrains Mono'; font-size: 18px; font-weight:700; color: var(--accent); }
+  .agent-card .tag-sm{
+    font-family:'JetBrains Mono'; font-size: 9px; color: var(--text-dim);
+    border: 1px solid var(--line); padding: 2px 7px; border-radius: 4px;
+  }
+  .agent-card h3{ font-size: 14.5px; font-weight: 700; margin-bottom: 8px; }
+  .agent-card p{ font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+
+  /* ---------- TOPICS ---------- */
+  .topic-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .topic-card{
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px;
+  }
+  .topic-card h3{ font-size: 15.5px; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
+  .topic-card p{ font-size: 13.5px; color: var(--text-dim); }
+  .topic-card code{
+    display:block; margin-top: 14px; font-family:'JetBrains Mono'; font-size: 12px;
+    color: var(--accent-2); background: var(--bg); padding: 10px 12px; border-radius: 6px;
+    border: 1px solid var(--line);
+  }
+
+  /* ---------- FEATURES (technical) ---------- */
+  .feature-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .feature{
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px;
+    transition: border-color .2s ease;
+  }
+  .feature:hover{ border-color: var(--accent); }
+  .feature .feature-head{ display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 8px; }
+  .feature h3{ font-size: 14.5px; font-weight: 700; font-family:'JetBrains Mono'; }
+  .feature h3::before{ content:"▸ "; color: var(--accent); }
+  .feature p{ font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+  .feature .impl{
+    margin-top: 12px; font-family:'JetBrains Mono'; font-size: 11.5px; color: var(--accent-2);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+  }
+  .pill{
+    font-family:'JetBrains Mono'; font-size: 9.5px; color: var(--bg);
+    background: var(--accent); padding: 3px 8px; border-radius: 20px; font-weight: 700; white-space:nowrap;
+  }
+
+  /* ---------- DISCLAIMER ---------- */
+  .disclaimer{
+    background: var(--bg-panel); border: 1px solid var(--accent); border-radius: 10px;
+    padding: 22px 24px; font-size: 13.5px; color: var(--text-dim);
+  }
+  .disclaimer strong{ color: var(--accent); }
+
+  /* ---------- LINKS ---------- */
+  .links-grid{ display:flex; gap: 14px; flex-wrap: wrap; }
+  .link-card{
+    flex:1; min-width: 250px; background: var(--bg-panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 24px; text-decoration:none; color: var(--text);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .link-card:hover{ border-color: var(--accent); transform: translateY(-2px); }
+  .link-card .label{ font-family:'JetBrains Mono'; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .link-card .title{ font-size: 16px; font-weight: 700; margin-top: 8px; color: var(--accent); }
+  .link-card .desc{ font-size: 13px; color: var(--text-dim); margin-top: 6px; }
+
+  footer{ border-top: 1px solid var(--line); padding: 26px 0; text-align:center; }
+  footer p{ font-family:'JetBrains Mono'; font-size: 11.5px; color: var(--text-dim); }
+  footer a{ color: var(--accent); text-decoration:none; }
+
+  @media (max-width: 800px){
+    .about-grid{ grid-template-columns: 1fr; }
+    .pipeline{ grid-template-columns: 1fr 1fr; }
+    .feature-grid{ grid-template-columns: 1fr; }
+    .topic-grid{ grid-template-columns: 1fr; }
+    .nav-links{ display:none; }
+  }
+  @media (max-width: 480px){
+    .pipeline{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div class="wrap">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="filename">moneymate_ai.py</div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="bracket">&lt;</span>MoneyMate AI<span class="bracket">/&gt;</span></div>
+    <div class="nav-links">
+      <a href="#about">about</a>
+      <a href="#pipeline">how it works</a>
+      <a href="#topics">topics</a>
+      <a href="#features">features</a>
+      <a href="#links">explore</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+
+    <h1>Ask about money. Get a <span class="accent-text">simple, practical</span> answer.</h1>
+    <p class="lede">MoneyMate AI is a Streamlit-based personal finance assistant that explains budgeting, savings, SIPs, mutual funds, and debt management in plain, beginner-friendly language — powered by Google's Gemini model through LangChain.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://huggingface.co/spaces/prudhvi28x/Smart-Personal-Finance-AI-Assistant" target="_blank">▶ view_demo</a>
+      <a class="btn btn-secondary" href="https://github.com/prudhvikakkunuri/AI_Budget-and-Financial-Advisor" target="_blank">source_code</a>
+    </div>
+    <div class="stack-row">
+      <span class="tag">LangChain</span>
+      <span class="tag">Gemini 2.5 Flash</span>
+      <span class="tag">Streamlit</span>
+      <span class="tag">Python</span>
+      <span class="tag">dotenv</span>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-label">about</div>
+    <h2>Finance advice without the jargon</h2>
+    <div class="about-grid" style="margin-top: 24px;">
+      <div>
+        <p>Personal finance is full of intimidating terms — SIPs, mutual funds, emergency funds, expense ratios — and most people avoid planning their money simply because the language feels like it's not meant for them.</p>
+        <p>MoneyMate AI removes that barrier. A single, purpose-built prompt instructs the model to act as a personal finance advisor, explain concepts with real examples, recommend budgeting and saving strategies, flag investment risk honestly, and never promise guaranteed or unrealistic returns.</p>
+      </div>
+      <div class="code-block">
+        <div><span class="k">model</span> = <span class="v">"gemini-2.5-flash"</span></div>
+        <div><span class="k">temperature</span> = <span class="v">0.6</span></div>
+        <div><span class="k">framework</span> = <span class="v">"LangChain"</span></div>
+        <div><span class="k">prompt_template</span> = <span class="v">ChatPromptTemplate</span></div>
+        <div><span class="k">ui</span> = <span class="v">"Streamlit"</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="wrap">
+    <div class="section-label">how it works</div>
+    <h2>From question to grounded financial advice</h2>
+    <p class="section-sub">A lightweight chain turns a raw money question into a structured, responsible answer.</p>
+    <div class="pipeline" style="margin-top: 30px;">
+      <div class="agent-card">
+        <div class="top-row"><div class="num">01</div><div class="tag-sm">input</div></div>
+        <h3>User question</h3>
+        <p>The user types a finance question in plain language through a simple Streamlit text input.</p>
+      </div>
+      <div class="agent-card">
+        <div class="top-row"><div class="num">02</div><div class="tag-sm">prompt</div></div>
+        <h3>Finance system prompt</h3>
+        <p>A detailed ChatPromptTemplate frames the model as a finance advisor with motivating, jargon-free rules.</p>
+      </div>
+      <div class="agent-card">
+        <div class="top-row"><div class="num">03</div><div class="tag-sm">generate</div></div>
+        <h3>Gemini generation</h3>
+        <p>The prompt is piped into Google's Gemini 2.5 Flash model via LangChain to generate the response.</p>
+      </div>
+      <div class="agent-card">
+        <div class="top-row"><div class="num">04</div><div class="tag-sm">display</div></div>
+        <h3>Chat-style answer</h3>
+        <p>The answer is rendered in a styled chat bubble, with headings and bullet points for easy reading.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="topics">
+  <div class="wrap">
+    <div class="section-label">what it covers</div>
+    <h2>Built-in finance knowledge areas</h2>
+    <p class="section-sub">The system prompt anchors every answer to specific, practical money topics instead of vague generalities.</p>
+    <div class="topic-grid" style="margin-top: 30px;">
+      <div class="topic-card">
+        <h3>Budgeting &amp; saving</h3>
+        <p>Helps split monthly income sensibly and build consistent saving habits with concrete percentages.</p>
+        <code>"How should I divide my monthly salary?"</code>
+      </div>
+      <div class="topic-card">
+        <h3>Investments &amp; SIPs</h3>
+        <p>Breaks down mutual funds and SIP investing in simple terms, with risk called out explicitly.</p>
+        <code>"Explain SIP investment in simple words"</code>
+      </div>
+      <div class="topic-card">
+        <h3>Emergency funds</h3>
+        <p>Gives practical guidance on how large an emergency fund should be relative to monthly expenses.</p>
+        <code>"How much emergency fund should I keep?"</code>
+      </div>
+      <div class="topic-card">
+        <h3>Debt &amp; financial discipline</h3>
+        <p>Covers debt management strategies and habits that build long-term financial discipline.</p>
+        <code>"Tips to save money faster"</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-label">technical capabilities</div>
+    <h2>What it does, under the hood</h2>
+    <div class="feature-grid" style="margin-top: 30px;">
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Prompt-engineered persona</h3>
+          <span class="pill">LANGCHAIN</span>
+        </div>
+        <p>A single ChatPromptTemplate locks the model into a consistent finance-advisor persona with explicit response rules and formatting instructions.</p>
+        <div class="impl">prompt = ChatPromptTemplate.from_template(template)</div>
+      </div>
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Composable LCEL chain</h3>
+          <span class="pill">LCEL</span>
+        </div>
+        <p>Prompt and model are composed with the LangChain pipe operator, keeping the generation logic to a single declarative line.</p>
+        <div class="impl">chain = prompt | model</div>
+      </div>
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Gemini 2.5 Flash inference</h3>
+          <span class="pill">GOOGLE GENAI</span>
+        </div>
+        <p>Runs on Google's fast Gemini 2.5 Flash model via langchain_google_genai, tuned with a moderate temperature for advice that's consistent but not robotic.</p>
+        <div class="impl">GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.6)</div>
+      </div>
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Secure config via dotenv</h3>
+          <span class="pill">ENV</span>
+        </div>
+        <p>API credentials are loaded from environment variables at startup, keeping secrets out of source control.</p>
+        <div class="impl">load_dotenv()</div>
+      </div>
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Custom Streamlit theming</h3>
+          <span class="pill">CSS INJECT</span>
+        </div>
+        <p>Native Streamlit chrome is hidden and replaced with a hand-styled dark gradient UI, custom inputs, buttons, and chat bubbles via injected CSS.</p>
+        <div class="impl">st.markdown(css, unsafe_allow_html=True)</div>
+      </div>
+      <div class="feature">
+        <div class="feature-head">
+          <h3>Guided sidebar &amp; examples</h3>
+          <span class="pill">UX</span>
+        </div>
+        <p>A persistent sidebar lists what the assistant helps with, and an expander surfaces ready-made example questions to lower the barrier to a first query.</p>
+        <div class="impl">st.expander("💡 Example Questions")</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="disclaimer" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-label">responsible by design</div>
+    <h2>Guardrails built into the prompt</h2>
+    <p class="section-sub" style="margin-bottom: 26px;">The system prompt is explicitly constrained to avoid overpromising on financial outcomes.</p>
+    <div class="disclaimer">
+      <strong>⚠️ Educational guidance, not financial advice.</strong> MoneyMate AI explains personal finance concepts and encourages healthy money habits, but it never guarantees profits or unrealistic returns, and it flags investment risk clearly whenever it's relevant. For decisions involving real money, it's not a substitute for a licensed financial advisor.
+    </div>
+  </div>
+</section>
+
+<section id="links" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-label">explore</div>
+    <h2>Try it or read the code</h2>
+    <div class="links-grid" style="margin-top: 26px;">
+      <a class="link-card" href="https://huggingface.co/spaces/prudhvi28x/Smart-Personal-Finance-AI-Assistant" target="_blank">
+        <div class="label">live_demo</div>
+        <div class="title">Hugging Face Spaces →</div>
+        <div class="desc">Ask a finance question and get a grounded answer directly in your browser.</div>
+      </a>
+      <a class="link-card" href="https://github.com/prudhvikakkunuri/AI_Budget-and-Financial-Advisor" target="_blank">
+        <div class="label">source_code</div>
+        <div class="title">GitHub Repository →</div>
+        <div class="desc">See the full prompt design, Gemini integration, and Streamlit UI.</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>MoneyMate AI · Your Personal Finance Guide · Built with Streamlit, LangChain &amp; Gemini</p>
+  </div>
+</footer>
+
+</body>
+</html>
