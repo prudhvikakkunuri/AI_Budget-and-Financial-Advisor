@@ -1,16 +1,23 @@
 from dotenv import load_dotenv
 import streamlit as st
-from langchain_google_genai import GoogleGenerativeAI
+from langchain_mistralai import ChatMistralAI
 from langchain_core.prompts import ChatPromptTemplate
+
+# ---------------- LOAD ENV ---------------- #
+import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+# ---------------- PAGE CONFIG ---------------- #
 st.set_page_config(
     page_title="MoneyMate AI",
     page_icon="💰",
     layout="centered"
 )
 
+# ---------------- CUSTOM CSS ---------------- #
 st.markdown("""
 <style>
 
@@ -121,6 +128,7 @@ section[data-testid="stSidebar"] {
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------- TITLE ---------------- #
 st.markdown(
     "<div class='main-title'>💰 MoneyMate AI</div>",
     unsafe_allow_html=True
@@ -131,6 +139,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ---------------- SIDEBAR ---------------- #
 with st.sidebar:
 
     st.title("💰 MoneyMate AI")
@@ -152,6 +161,7 @@ with st.sidebar:
     st.markdown("---")
 
 
+# ---------------- EXAMPLE QUESTIONS ---------------- #
 with st.expander("💡 Example Questions"):
 
     st.write("""
@@ -161,6 +171,7 @@ with st.expander("💡 Example Questions"):
     • Tips to save money faster  
     """)
 
+# ---------------- PROMPT ---------------- #
 template = """
 You are MoneyMate AI,
 an expert Personal Finance Advisor with deep knowledge of:
@@ -197,18 +208,27 @@ Question:
 
 prompt = ChatPromptTemplate.from_template(template)
 
-model = GoogleGenerativeAI(
-    model="gemini-2.5-flash",
+# ---------------- MODEL ---------------- #
+llm = ChatMistralAI(
+    model="mistral-small-2506",
     temperature=0.6
-)
+    )
 
-chain = prompt | model
 
+# ---------------- CHAIN ---------------- #
+from langchain_core.output_parsers import StrOutputParser
+
+parser = StrOutputParser()
+
+chain = prompt | llm | parser
+
+# ---------------- USER INPUT ---------------- #
 user_input = st.text_input(
     "Ask anything about money, savings, investments, or budgeting:",
     placeholder="Example: How can I save money every month?"
 )
 
+# ---------------- RESPONSE ---------------- #
 if st.button("Get Advice"):
 
     if user_input.strip() == "":
@@ -228,6 +248,7 @@ if st.button("Get Advice"):
         with st.chat_message("assistant"):
             st.markdown(response)
 
+# ---------------- FOOTER ---------------- #
 st.markdown(
     """
     <div class='footer'>
